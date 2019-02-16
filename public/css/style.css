@@ -1,0 +1,237 @@
+
+/*------------------------------------------------------
+ * GENERAL
+ *------------------------------------------------------*/
+html, body { height: 100%; }
+main { min-height: calc(100% - 72px); }
+form input[type="submit"] { margin-right: 5px; }
+form p { padding: 5px; }
+footer { text-align: right; }
+.error { color: #a94442; }
+
+/*------------------------------------------------------
+ * TITLES
+ *------------------------------------------------------*/
+
+.page-header h2 {
+  margin: 0;
+}
+.form-header {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+}
+.header-neutral {
+  color: #959595;
+}
+.header-info {
+  color: #31708f;
+}
+.actions {
+  padding: 5px 0;
+}
+
+/*------------------------------------------------------
+ * MODAL
+ *------------------------------------------------------*/
+
+.modal { background-color: rgba(255,255,255,0.9); }
+.modal-content { border-radius: 0; padding: 15px; background-color: #f5f5f5; }
+.modal-body { padding: 0 10px }
+.modal.fade .modal-dialog {
+  top: 45%;
+  -webkit-transform: translate(0,-50%);
+  -ms-transform: translate(0,-50%);
+  -o-transform: translate(0,-50%);
+  transform: translate(0,-50%);
+}
+.modal-footer {
+  border-top: 0;
+  padding: 0;
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+}
+
+/*------------------------------------------------------
+ * LAYOUT
+ *------------------------------------------------------*/
+
+.l-br {
+  margin-bottom: 0;
+}
+
+/*------------------------------------------------------
+ * LOADER
+ *------------------------------------------------------*/
+
+.js-load { position: relative; }
+.js-load img.loader {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  height: 25px;
+  display: none;
+}
+.js-load.loading img.loader {
+  display: block;
+}
+
+/*------------------------------------------------------
+ * LOGIN PAGE
+ *------------------------------------------------------*/
+
+#login {
+  position:absolute;
+  width: 100%;
+  top: 50%;
+  height: 340px;
+  margin-top: -240px; /* 340/2 + 72 */
+}
+.login { margin: 15px 0; padding: 0 15px 15px 15px; }
+
+/*------------------------------------------------------
+ * ADD BOOK
+ *------------------------------------------------------*/
+
+.row_info { background-color: #d9edf7; }
+.row_aside { background-color: #f5f5f5; margin-top: 10px; }
+
+/*------------------------------------------------------
+ * BOOK LIST
+ *------------------------------------------------------*/
+
+.form-group {
+  white-space: nowrap;
+}
+.content[data-mode="icon"],
+.content.empty {
+  border: 1px solid #ddd;
+  border-top: 0;
+  padding: 5px;
+}
+.content.empty {
+  padding: 15px 0 10px 10px;
+}
+
+.count:empty { display: none; }
+.count::before { content: "("; }
+.count::after { content: ")"; }
+
+/* switch mode*/
+.switch-mode { padding: 0 0 2px 15px; }
+.switch-mode__btn { padding: 5px; }
+.switch-mode__btn:not(.active) { opacity: 0.2; cursor: pointer; }
+.switch-mode__btn:hover { opacity: 1; }
+
+.content[data-mode="icon"] .item.book { display: none; }
+.content[data-mode="detail"] .item.thumbnail { display: none; }
+
+/*------------------------------------------------------
+ * BOOK LIST: DETAILS MODE
+ *------------------------------------------------------*/
+
+/* details */
+.flex { display: flex; }
+.flex > * { padding: 0 15px; }
+.flex > *:last-child { width: 100%; }
+
+@media(max-width: 500px) {
+  .flex { display: block; }
+  .flex > * { padding: 5px 0; }
+}
+
+.book__title { margin-bottom: 0; display: block; font-size: 1.1em; }
+.book__subtitle { font-weight: 700; font-size: 1em; }
+.book__aside { color: #a0a0a0; }
+
+.book__author:not(:last-child)::after { content: ", "; }
+.book__date:not(:first-child)::before { content: ", "; }
+.book__pageCount:not(:first-child)::before { content: " - "; }
+
+.book__edit { float: right; }
+.modal-body .book__edit { float: none; padding-left: 30px; }
+
+/* thumbnail */
+.book-thumbnail {
+  width: 130px;
+  height: 195px;
+  margin: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 19px;
+  position: relative;
+  font-weight: bold;
+  padding: 0;
+  text-align: center;
+}
+.book-thumbnail__maturity {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+.book-thumbnail_disabled {
+  opacity: 0.2;
+}
+.book-thumbnail__title {
+  display: table-cell;
+  vertical-align: middle;
+  height: 190px;
+  min-width: 130px;
+}
+.book-thumbnail__img {
+  max-width: 130px;
+  min-width: 130px;
+  display: inline-block;
+}
+
+/*------------------------------------------------------
+ * BOOK LIST: THUMBNAIL MODE
+ *------------------------------------------------------*/
+
+/* Display actions on hover */
+.hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  transition: background .3s ease-in-out;
+}
+.hover:hover {
+  background-color: rgba(0,0,0,0.3);
+}
+.hover > * {
+  display: block;
+  position: absolute; top: 50%;
+  height: 48px; width: 48px;
+  margin-top: -24px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out 0s,
+              left 0.3s ease-in-out 0s,
+              right 0.3s ease-in-out 0s;
+
+  font-size: 1.5em;
+  line-height: 46px;
+  color: black !important;
+  border: 1px solid black;
+  background-color: #f5f5f5;
+}
+.hover .left { left: 0; margin-left: -50px; }
+.hover .right { right: 0; margin-right: -50px; }
+
+.hover:hover .left { left: 50%; opacity: 1; }
+.hover:hover .right { right: 50%; opacity: 1; }
+
+.read {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: red;
+  color: black;
+  font-weight: 500;
+  padding: 5px;
+}

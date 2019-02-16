@@ -1,0 +1,18 @@
+div(class="thumbnail pull-left book-thumbnail item" id="thumbnail"+item.id)
+    if item.thumbnail
+        img(src=item.thumbnail alt=item.title class="book-thumbnail__img")
+    else
+        span(class="book-thumbnail__title") #{item.title}
+
+    if item.isMature
+        span(class="book-thumbnail__maturity pull-right") <img src="http://i.imgur.com/yajkTdn.png" alt="Mature">
+
+    if item.isRead
+        span(class="read") Read
+
+    div(class="hover")
+        a(class="left js-view" title="View infos" href="#view" data-id=item.id)
+            span(class="glyphicon glyphicon-list-alt")
+
+        a(class="right" title="Edit infos" href=("/book/edit/" + item.id))
+            span(class="glyphicon glyphicon-edit")

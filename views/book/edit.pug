@@ -1,0 +1,87 @@
+extends ../layout
+
+block content
+
+    div(class="container")
+        if success
+          p(class="alert alert-success") #{success}
+
+        div(class="page-header")
+            div(class="pull-right actions")
+                a(href="/book/new") Add a book
+            h2 Edit book
+
+        include inc.item.pug
+        form(method="post")
+
+            div(class="list-group-item row_aside")
+                label(class="form-header header-neutral") Edit infos
+
+                div(class="form-group")
+                    label(for="title") Title *
+                    input(type="text" name="title" class="form-control required" id="title" value=item.title)
+
+                div(class="form-group")
+                    label(for="subtitle") Subtitle
+                    input(type="text" name="subtitle" class="form-control" id="subtitle" value=item.subtitle)
+
+                div(class="form-group")
+                    label(for="authors") Author(s)
+                    input(type="text" name="authors" class="form-control required" id="authors" value=item.authors)
+
+                div(class="form-group")
+                    label(for="publisher") Publisher
+                    input(type="text" name="publisher" class="form-control" id="publisher" value=item.publisher)
+
+                div(class="form-group")
+                    label(for="year") Year
+                    input(type="text" name="year" class="form-control" id="year" value=item.year)
+
+                div(class="form-group")
+                    label(for="pageCount") Page count
+                    input(type="text" name="pageCount" class="form-control" id="pageCount" value=item.pageCount)
+
+                div(class="form-group")
+                    label(for="category") Category
+                    input(type="text" name="category" class="form-control" id="category" value=item.category)
+
+                div(class="form-group")
+                    label(for="link") Link
+                    input(type="text" name="link" class="form-control" id="link" value=item.link)
+
+                div(class="form-group")
+                    label(for="thumbnail") Thumbnail
+                    input(type="text" name="thumbnail" class="form-control" id="thumbnail" value=item.thumbnail)
+
+                div(class="form-group")
+                    label Mature content ? &nbsp;
+                    label(class="radio-inline")
+                        input(type="radio" name="isMature" value="1" checked=(item.isMature))
+                        | Yes
+                    label(class="radio-inline")
+                        input(type="radio" name="isMature" value="0" checked=(!item.isMature))
+                        | No
+
+            br
+            div(class="list-group-item")
+                div(class="form-group")
+                    label Owned ? &nbsp;
+                    label(class="radio-inline")
+                        input(type="radio" name="isWishlist" value="0" checked=(!item.isWishlist))
+                        | Yes
+                    label(class="radio-inline")
+                        input(type="radio" name="isWishlist" value="1" checked=(item.isWishlist))
+                        | On wishlist
+
+                div(class="form-group")
+                    label Have read ? &nbsp;
+                    label(class="radio-inline")
+                        input(type="radio" name="isRead" value="1" checked=(item.isRead))
+                        | Yes
+                    label(class="radio-inline")
+                        input(type="radio" name="isRead" value="0" checked=(!item.isRead))
+                        | No
+
+            br
+            input(type="submit" class="btn btn-default" value="Update")
+            input(type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="if(!confirm('Are you sure ?')) { return false; }")

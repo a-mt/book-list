@@ -1,0 +1,105 @@
+extends layout
+
+block scripts
+    script(src="/public/js/book_list.js")
+    script.
+        $(document).ready(function(){
+            $('.nav-tabs a').click(function (e) {
+              e.preventDefault();
+              $(this).tab('show');
+            });
+        });
+
+block content
+    div(class="container")
+        if error
+            p(class="alert alert-danger l-br") #{error}
+            br
+        if success
+            p(class="alert alert-success l-br") #{success}
+            br
+
+        if !user
+            p(class="alert alert-danger") <a href="/login">Log in</a> to view your books
+        else
+            <!-- Popup to view infos -->
+            <div id="modal" class="modal fade" role="dialog">
+              <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button><br>
+                  <div class="modal-body">
+                    <p></p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Panels -->
+            - var modeDetail = (cookies.viewMode && cookies.viewMode == "detail")
+
+            div(class="page-header")
+                div(class="pull-right switch-mode js-switch-view")
+                    span(class=("glyphicon glyphicon-th-large switch-mode__btn" + (modeDetail ? "" : " active")) data-mode="icon" title="Icons view")
+                    span(class=("glyphicon glyphicon-th-list switch-mode__btn" + (modeDetail ? " active" : "")) data-mode="detail" title="Detailled view")
+
+                div(class="pull-right actions")
+                    if books.length > 0
+                        a(href=("/export")) Export JSON
+                        span &nbsp; / &nbsp;
+
+                    a(href="/book/new") Add a book
+
+                h2 Your books &nbsp;
+                    span(class="count")= books.length
+
+            form(class="filter row_aside list-group-item clearfix")
+                label(class="form-header header-neutral") Filters
+
+                div(class="form-group")
+                    label Owned ? &nbsp;
+                    label(class="radio-inline")
+                        input(type="radio" name="isWishlist" value="0" checked=(filters.isWishlist == "0"))
+                        | Yes
+                    label(class="radio-inline")
+                        input(type="radio" name="isWishlist" value="1" checked=(filters.isWishlist == "1"))
+                        | On wishlist
+                    label(class="radio-inline")
+                        input(type="radio" name="isWishlist" value="2" checked=(filters.isWishlist == "2"))
+                        | All
+
+                div(class="form-group")
+                    label Have read ? &nbsp;
+                    label(class="radio-inline")
+                        input(type="radio" name="isRead" value="1" checked=(filters.isRead == "1"))
+                        | Yes
+                    label(class="radio-inline")
+                        input(type="radio" name="isRead" value="0" checked=(filters.isRead == "0"))
+                        | No
+                    label(class="radio-inline")
+                        input(type="radio" name="isRead" value="2" checked=(filters.isRead == "2"))
+                        | All
+
+                div(class="form-group")
+                    label(for="title") Title
+                    input(type="text" name="title" class="form-control" id="title" value=filters.title)
+
+                div(class="form-group")
+                    label(for="author") Author
+                    input(type="text" name="author" class="form-control" id="author" value=filters.author)
+
+                input(type="submit" class="btn btn-default pull-right" value="Update")
+
+            div(class=("content" + (books.length == 0 ? ' empty' : '')) data-mode=(modeDetail ? "detail" : "icon"))
+                - var edit = true
+                p(style=(books.length > 0 ? 'display:none': '')) There are no books matching your filter
+
+                div(class="clearfix list")
+                    for item in books
+                        include book/inc.thumbnail.pug
+                        include book/inc.item.pug

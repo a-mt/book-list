@@ -1,0 +1,30 @@
+extends ../layout.pug
+
+block content
+
+  div(class="jumbotron")
+    div(class="container")
+
+        p Username: #{user.username}
+
+  div(class="container")
+    div(class="thumbnail jumbotron")
+
+        div(class="form-group")
+          label(for="email") Email
+          div(id="email") #{user.email}
+
+        if user.fullname
+          div(class="form-group")
+            label(for="fullname") Full name
+            div(id="fullname") #{user.fullname}
+
+        if user.state
+          div(class="form-group")
+            label(for="state") State
+            div(id="state") #{user.state}
+
+        if user.city
+          div(class="form-group")
+            label(for="city") City
+            div(id="city") #{user.city}

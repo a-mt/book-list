@@ -1,0 +1,159 @@
+extends ../layout
+
+block scripts
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js" crossorigin="anonymous")
+    script(src="/public/js/book_autocomplete.js")
+
+block content
+
+    div(class="container")
+
+        for error in errors
+            p(class="alert alert-danger") #{error.message}
+        if data
+            script
+                | var data = !{JSON.stringify(data)};
+
+        div(class="page-header")
+            div(class="pull-right actions")
+                a(href="/import") Import list
+            h2 Add a book
+
+        form(method="post")
+            div(class="list-group-item row_info")
+                label(class="form-header header-info") Search on Google Books
+
+                div(class="form-group")
+                    label(for="search") Title
+                    div(class="js-load")
+                        input(type="text" name="search" id="search" class="js-autocomplete-book form-control" value=(data.search ? data.search : '') placeholder="Type a title to lookup" autocomplete="off")
+                        img(src="http://i.imgur.com/nWp875t.gif" class="loader")
+
+                div(class="form-group")
+                    label(for="lang") Language
+                    div
+                        select(for="lang" class="js-autocomplete-lang" autocomplete="off") Language
+                            option(value="None" selected=("None" == user.lang)) All languages
+                            each val, index in langs
+                                option(value=index selected=(index == user.lang))= val
+
+            div(id="results")
+
+            div(id="add-custom" class="list-group-item flex row_aside")
+                div
+                    input(name="choice" id="bookCustom" value="custom" type="radio" autocomplete="off" class="js-choose")
+
+                div
+                    label(class="form-header header-neutral" for="bookCustom") Manual data entry
+
+                    div(class="form-group")
+                        label(for="title") Title *
+                        input(type="text" name="title" class="form-control required" id="title")
+
+                    div(class="form-group")
+                        label(for="subtitle") Subtitle
+                        input(type="text" name="subtitle" class="form-control" id="subtitle")
+
+                    div(class="form-group")
+                        label(for="authors") Author(s)
+                        input(type="text" name="authors" class="form-control required" id="authors")
+
+                    div(class="form-group")
+                        label(for="publisher") Publisher
+                        input(type="text" name="publisher" class="form-control" id="publisher")
+
+                    div(class="form-group")
+                        label(for="year") Year
+                        input(type="text" name="year" class="form-control" id="year")
+
+                    div(class="form-group")
+                        label(for="pageCount") Page count
+                        input(type="text" name="pageCount" class="form-control" id="pageCount")
+
+                    div(class="form-group")
+                        label(for="category") Category
+                        input(type="text" name="category" class="form-control" id="category")
+
+                    div(class="form-group")
+                        label(for="link") Link
+                        input(type="text" name="link" class="form-control" id="link")
+
+                    div(class="form-group")
+                        label(for="thumbnail") Thumbnail
+                        input(type="text" name="thumbnail" class="form-control" id="thumbnail")
+
+                    div(class="form-group")
+                        label Mature content ? &nbsp;
+                        label(class="radio-inline")
+                            input(type="radio" name="isMature" value="1")
+                            | Yes
+                        label(class="radio-inline")
+                            input(type="radio" name="isMature" value="0" checked)
+                            | No
+
+            br
+            div(class="list-group-item")
+                div(class="form-group")
+                    label Owned ? &nbsp;
+                    label(class="radio-inline")
+                        input(type="radio" name="isWishlist" value="0")
+                        | Yes
+                    label(class="radio-inline")
+                        input(type="radio" name="isWishlist" value="1" checked)
+                        | On wishlist
+
+                div(class="form-group")
+                    label Have read ? &nbsp;
+                    label(class="radio-inline")
+                        input(type="radio" name="isRead" value="1")
+                        | Yes
+                    label(class="radio-inline")
+                        input(type="radio" name="isRead" value="0" checked)
+                        | No
+            br
+            input(type="submit" id="submit" class="btn" disabled title="Pick your book")
+
+    script(type="text/tpl" id="book-item-tpl")
+        div(class="list-group-item flex book")
+            div
+                input(name="choice" value="{{id}}" id="book{{id}}" type="radio" autocomplete="off" class="js-choose")
+
+            div
+                label(for="book{{id}}" class="book-thumbnail")
+                    img(src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}}" class="book-thumbnail__img")
+
+                    | {{#volumeInfo.mature}}
+                    span(class="book-thumbnail__maturity pull-right") <img src="http://i.imgur.com/yajkTdn.png" alt="Mature">
+                    | {{/volumeInfo.mature}}
+
+            div
+                div
+                    label(class="book__title") {{volumeInfo.title}} &nbsp;
+                    | {{#volumeInfo.subtitle}}
+                    small(class="book__subtitle") {{volumeInfo.subtitle}}
+                    | {{/volumeInfo.subtitle}}
+
+                div
+                    | {{#volumeInfo.hasAuthors}}
+                    span(class="book__authors") by {{#volumeInfo.authors}}<span class="book__author">{{.}}</span>{{/volumeInfo.authors}}
+                    | {{/volumeInfo.hasAuthors}}
+
+                div(class="book__aside")
+                    | {{#volumeInfo.publisher}}
+                    span(class="book__publisher") {{volumeInfo.publisher}}
+                    | {{/volumeInfo.publisher}}
+
+                    | {{#volumeInfo.publishedDate}}
+                    span(class="book__date") {{volumeInfo.year}}
+                    | {{/volumeInfo.publishedDate}}
+
+                    | {{#volumeInfo.pageCount}}
+                    span(class="book__pageCount") {{volumeInfo.pageCount}} pages
+                    | {{/volumeInfo.pageCount}}
+
+                br
+                div
+                    span(class="book__category") {{volumeInfo.categories}}
+
+                    hr
+                    a(href="{{volumeInfo.previewLink}}" target="_blank") View book page

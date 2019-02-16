@@ -1,0 +1,53 @@
+extends ../layout.pug
+
+block content
+
+  div(class="jumbotron")
+    div(class="container")
+
+        p Username: #{user.username}
+        if user.provider != 'local'
+            p Logged in via #{user.provider}
+
+  div(class="container")
+    if success
+      p(class="alert alert-success") #{success}
+
+    form(method="post")
+        h2(class="page-header") Change my settings
+        p(class="alert alert-info") These informations are NOT visible to other users
+
+        div(class="form-group")
+            label(for="email") Email
+            input(type="text" name="email" id="email" class="form-control" required value=(data.email ? data.email : user.email))
+            if errors.email
+                p(class="error") #{errors.email.message}
+
+        div(class="form-group")
+            label(for="lang") Default search language
+            select(name="lang" id="lang" class="form-control" required autocomplete="off")
+                option(value="None" selected=("None" == user.lang)) All languages
+                each val, index in langs
+                    option(value=index selected=(index == user.lang))= val
+            if errors.lang
+                p(class="error") #{errors.lang.message}
+
+        input(type="submit" class="btn btn-default" name="submitSettings")
+
+    form(method="post")
+        h2(class="page-header") Change password
+
+        form(method="post")
+            div(class="form-group")
+                label(for="password") Current password
+                input(type="password" name="password" id="password" class="form-control" required value=(data.password ? data.password : ''))
+                if errors.password
+                    p(class="error") #{errors.password.message}
+
+            div(class="form-group")
+                label(for="newpassword") New Password
+                input(type="password" name="newpassword" id="newpassword" class="form-control" required value=(data.newpassword ? data.newpassword : ''))
+                if errors.newpassword
+                    p(class="error") #{errors.newpassword.message}
+
+            input(type="submit" class="btn btn-default" name="submitPassword")
