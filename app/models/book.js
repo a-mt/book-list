@@ -21,6 +21,7 @@ var Book = new Schema({
     link: String,                   // volumeInfo.previewLink
     isRead: Boolean,
     isWishlist: Boolean,
+    lang: String,
     insert: { type: Date, default: Date.now },
 });
 

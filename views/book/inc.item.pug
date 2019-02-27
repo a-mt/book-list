@@ -30,7 +30,8 @@ div(class="book flex list-group-item item")
                 span(class="book__date") #{item.year}
             if item.pageCount
                 span(class="book__pageCount") #{item.pageCount} pages
-
+            if item.lang
+                span(class="book__lang") <br>#{item.lang.toUpperCase()}
         br
         div
             span(class="book__category") #{item.category}

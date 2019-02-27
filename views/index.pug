@@ -93,6 +93,10 @@ block content
                     label(for="author") Author
                     input(type="text" name="author" class="form-control" id="author" value=filters.author)
 
+                div(class="form-group")
+                    label(for="lang") Language
+                    input(type="text" name="lang" class="form-control" id="lang" value=filters.lang)
+
                 input(type="submit" class="btn btn-default pull-right" value="Update")
 
             div(class=("content" + (books.length == 0 ? ' empty' : '')) data-mode=(modeDetail ? "detail" : "icon"))

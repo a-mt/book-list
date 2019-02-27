@@ -24,12 +24,13 @@ function BookHandler(){
                 isWishlist : "0",
                 isRead     : "2",
                 title      : "",
-                author     : ""
+                author     : "",
+                lang       : ""
             };
         }
 
         // Current filter
-        ["isWishlist", "isRead", "title", "author"].forEach((k) => {
+        ["isWishlist", "isRead", "title", "author", "lang"].forEach((k) => {
             filters[k] = (typeof _get[k] != "undefined" ? _get[k] : req.cookies.filters[k]);
         });
 
@@ -45,6 +46,9 @@ function BookHandler(){
         }
         if(filters.author) {
             q.authors = new RegExp(escapeRegExp(_get.author), 'i');
+        }
+        if(filters.lang) {
+            q.lang = _get.lang;
         }
 
         return [q, filters];
@@ -167,7 +171,8 @@ function BookHandler(){
                         pageCount  : json.pageCount,
                         category   : (json.categories ? json.categories[0] : ''),
                         isMature   : (json.maturityRating == 'MATURE'),
-                        link       : json.previewLink
+                        link       : json.previewLink,
+                        lang       : json.language
                     };
                     callback(post, isWishlist, isRead);
                 });
@@ -235,6 +240,7 @@ function BookHandler(){
             book.thumbnail  = post.thumbnail;
             book.isWishlist = (post.isWishlist == "1");
             book.isRead     = (post.isRead == "1");
+            book.lang       = post.lang;
 
             book.save(function(err){
 
