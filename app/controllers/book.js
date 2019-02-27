@@ -31,7 +31,7 @@ function BookHandler(){
 
         // Current filter
         ["isWishlist", "isRead", "title", "author", "lang"].forEach((k) => {
-            filters[k] = (typeof _get[k] != "undefined" ? _get[k] : req.cookies.filters[k]);
+            filters[k] = (typeof _get[k] != "undefined" ? _get[k] : req.cookies.filters[k]).trim();
         });
 
         // Build MongoDB query
@@ -42,13 +42,13 @@ function BookHandler(){
             q.isRead = (filters.isRead == "1");
         }
         if(filters.title) {
-            q.title = new RegExp(escapeRegExp(_get.title), 'i');
+            q.title = new RegExp(escapeRegExp(filters.title), 'i');
         }
         if(filters.author) {
-            q.authors = new RegExp(escapeRegExp(_get.author), 'i');
+            q.authors = new RegExp(escapeRegExp(filters.author), 'i');
         }
         if(filters.lang) {
-            q.lang = _get.lang;
+            q.lang = filters.lang;
         }
 
         return [q, filters];
