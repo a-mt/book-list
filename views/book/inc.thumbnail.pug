@@ -1,6 +1,9 @@
 div(class="thumbnail pull-left book-thumbnail item" id="thumbnail"+item.id)
     if item.thumbnail
-        img(src=item.thumbnail alt=item.title class="book-thumbnail__img")
+        if isList
+            img(src="/public/img/thumbnail.png" data-original=item.thumbnail alt=item.title class="book-thumbnail__img js-lazy")
+        else
+            img(src=item.thumbnail alt=item.title class="book-thumbnail__img")
     else
         span(class="book-thumbnail__title") #{item.title}
 

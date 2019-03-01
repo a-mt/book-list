@@ -2,13 +2,22 @@ extends layout
 
 block scripts
     script(src="/public/js/book_list.js")
+    script(src="/public/js/jquery.lazyload.min.js")
     script.
         $(document).ready(function(){
             $('.nav-tabs a').click(function (e) {
               e.preventDefault();
               $(this).tab('show');
             });
+
+            lazyload();
         });
+
+        // Lazyload either all images or specified items (after ajax request)
+        function lazyload(items) {
+            items = items ?  $("img.js-lazy", items) : "img.js-lazy";
+            $(items).show().lazyload({ effect : "fadeIn", failurelimit : 0 });
+        }
 
 block content
     div(class="container")
@@ -100,7 +109,7 @@ block content
                 input(type="submit" class="btn btn-default pull-right" value="Update")
 
             div(class=("content" + (books.length == 0 ? ' empty' : '')) data-mode=(modeDetail ? "detail" : "icon"))
-                - var edit = true
+                - var isList = true
                 p(style=(books.length > 0 ? 'display:none': '')) There are no books matching your filter
 
                 div(class="clearfix list")
