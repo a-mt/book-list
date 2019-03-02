@@ -89,7 +89,7 @@ function BookHandler(){
         }
 
         // Query Google API
-        https.get('https://www.googleapis.com/books/v1/volumes?key=' + process.env.GOOGLE_BOOK_KEY + '&q=' + name + (lang ? '&langRestrict=' + lang : ''), function(subres){
+        https.get('https://www.googleapis.com/books/v1/volumes?key=' + process.env.GOOGLE_API_KEY + '&q=' + name + (lang ? '&langRestrict=' + lang : ''), function(subres){
 
             if(subres.statusCode != 200) {
                 res.status(subres.statusCode).send(subres.statusMessage);
@@ -150,7 +150,7 @@ function BookHandler(){
         if(id == 'custom') {
             callback(req.body, isWishlist, isRead);
         } else {
-            https.get('https://www.googleapis.com/books/v1/volumes/' + id + '?key=' + process.env.GOOGLE_BOOK_KEY, function(subres){
+            https.get('https://www.googleapis.com/books/v1/volumes/' + id + '?key=' + process.env.GOOGLE_API_KEY, function(subres){
 
             if(subres.statusCode != 200) {
                 res.status(subres.statusCode).send(subres.statusMessage);
@@ -228,6 +228,9 @@ function BookHandler(){
 
         // Update info
         } else {
+            if(post.thumbnail.trim() != book.thumbnail.trim()) {
+                book.tc = null;
+            }
             book.title      = post.title;
             book.subtitle   = post.subtitle;
             book.authors    = post.authors;

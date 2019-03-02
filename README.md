@@ -25,3 +25,30 @@ Use cases:
 ## Run
 
     npm start
+
+## Dev notes
+
+### Import thumbnails
+
+- Create an app
+    - Activate Google Drive API
+    - Create Credentials: OAuth client ID
+    - In OAuth consent screen, add the current host
+    - In the details of the created client ID,
+      add https://yourapp:8081/oauth2callback to the Authorized redirect URIs
+    - Update the .env file
+
+- Create a folder in Google Drive
+    - Get the sharing link of the folder (to make the folder public)
+    - Copy the ID of the folder
+    - Update the .env file
+
+- Start webserver via node importThumbnails.js
+- Go to https://yourapp:8081
+
+### Update node
+
+    nvm install stable
+    npm i npm-check-updates
+    ncu -u
+    npm install

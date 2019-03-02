@@ -23,6 +23,7 @@ var Book = new Schema({
     isWishlist: Boolean,
     lang: String,
     insert: { type: Date, default: Date.now },
+    tc: Boolean                     // thumbnail is cached
 });
 
 Book.index({ _owner: 1, isWishlist: 1, isRead: 1 });

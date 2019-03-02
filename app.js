@@ -9,7 +9,10 @@ require('dotenv').load(); // load .env variables
 
 // Connect DB
 var mongoose = require('mongoose');
-mongoose.connection.openUri(process.env.MONGO_URI);
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useCreateIndex: true
+});
 mongoose.Promise = global.Promise;
 
 // Auth
