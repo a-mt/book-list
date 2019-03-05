@@ -6,6 +6,8 @@ block content
     div(class="container")
 
         p Username: #{user.username}
+        small Sharing link:&nbsp;
+            a(href="/books/" + user._id) #{url}/books/#{user._id}
         if user.provider != 'local'
             p Logged in via #{user.provider}
 

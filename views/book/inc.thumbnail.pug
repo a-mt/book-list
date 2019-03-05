@@ -17,5 +17,6 @@ div(class="thumbnail pull-left book-thumbnail item" id="thumbnail"+item.id)
         a(class="left js-view" title="View infos" href="#view" data-id=item.id)
             span(class="glyphicon glyphicon-list-alt")
 
-        a(class="right" title="Edit infos" href=("/book/edit/" + item.id))
-            span(class="glyphicon glyphicon-edit")
+        if edit
+            a(class="right" title="Edit infos" href=("/book/edit/" + item.id))
+                span(class="glyphicon glyphicon-edit")

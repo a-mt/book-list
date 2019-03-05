@@ -1,6 +1,6 @@
 div(class="book flex list-group-item item")
     div
-        - var tag = isList ? "a" : "label"
+        - var tag = edit ? "a" : "label"
         #{tag}(class="book-thumbnail thumbnail" href="/book/edit/" + item.id)
             if item.thumbnail
                 if isList
@@ -43,6 +43,6 @@ div(class="book flex list-group-item item")
                 hr
             if item.link
                 a(href=item.link target="_blank") View book page
-            if isList
+            if edit
                 a(class="book__edit" title="Edit infos" href=("/book/edit/" + item.id))
                     span(class="glyphicon glyphicon-edit")

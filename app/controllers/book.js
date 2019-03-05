@@ -15,8 +15,18 @@ function BookHandler(){
 
     function buildQuery(req) {
         var _get    = req.query,
-            q       = { _owner: req.user.id },
+            userid  = req.user ? req.user.id : false,
+            q       = {},
             filters = {};
+
+        // Filter books of given user
+        if(req.params.userid) {
+            userid       = req.params.userid;
+            filters.user = userid;
+        } else {
+            filters.user = false;
+        }
+        q._owner = userid;
 
         // Default filter
         if(typeof req.cookies.filters == "undefined") {
@@ -57,25 +67,30 @@ function BookHandler(){
     this.index = function(req, res) {
         var books   = [],
             filters = {},
-            q;
+            q,
+            title   = "Your books";
 
-        if(!req.user) {
-            res.render('index', { books, filters });
+        if(!req.user && !req.params.userid) {
+            res.render('index', { books, filters, title });
             return;
         }
 
         // Filters
         [q, filters] = buildQuery(req);
 
+        if(filters.user) {
+            title = "Books of " + filters.user;
+        }
+
         // Find books
-        var query = Book.find(q).populate('_owner').then(function(docs){
+        var query = Book.find(q).then(function(docs){
             books = docs;
         });
 
         // Render
         query.then(function(){
             res.cookie('filters', filters);
-            res.render('index', { books, filters });
+            res.render('index', { books, filters, title });
         });
     };
 

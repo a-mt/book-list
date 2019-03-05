@@ -7,6 +7,7 @@ module.exports = function(app) {
 
     // Homepage
     app.get('/', bookHandler.index);
+    app.get('/books/:userid', bookHandler.index);
 
     // Add book
     app.post('/book/search', bookHandler.search);
@@ -20,8 +21,8 @@ module.exports = function(app) {
        .get(global.isLoggedIn, bookHandler.isBook, bookHandler.edit)
        .post(global.isLoggedIn, bookHandler.isBook, bookHandler.editSubmit);
 
-    // Import/export JSon
-    app.get('/export', global.isLoggedIn, bookHandler.exportJson);
+    // Import/export JSON
+    app.get('/export/:userid', bookHandler.exportJson);
 
     app.route('/import')
        .get(global.isLoggedIn, bookHandler.importJson)

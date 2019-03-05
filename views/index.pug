@@ -28,7 +28,7 @@ block content
             p(class="alert alert-success l-br") #{success}
             br
 
-        if !user
+        if !user && !filters.user
             p(class="alert alert-danger") <a href="/login">Log in</a> to view your books
         else
             <!-- Popup to view infos -->
@@ -59,12 +59,14 @@ block content
 
                 div(class="pull-right actions")
                     if books.length > 0
-                        a(href=("/export")) Export JSON
-                        span &nbsp; / &nbsp;
+                        a(href=("/export/" + (filters.user || ""))) Export JSON
+                        if user
+                            span &nbsp; / &nbsp;
 
-                    a(href="/book/new") Add a book
+                    if user
+                        a(href="/book/new") Add a book
 
-                h2 Your books &nbsp;
+                h2 #{title} &nbsp;
                     span(class="count")= books.length
 
             form(class="filter row_aside list-group-item clearfix")
@@ -110,6 +112,7 @@ block content
 
             div(class=("content" + (books.length == 0 ? ' empty' : '')) data-mode=(modeDetail ? "detail" : "icon"))
                 - var isList = true
+                - var edit   = user ? true  : false
                 p(style=(books.length > 0 ? 'display:none': '')) There are no books matching your filter
 
                 div(class="clearfix list")

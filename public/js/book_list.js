@@ -51,10 +51,15 @@ var Book = {
     // Open up a popup to display book infos
     view: function(e) {
         e.preventDefault();
-        var content = $(this).closest('.book-thumbnail').next().html();
+        var $div = $(this).closest('.book-thumbnail').next();
+
+        // Remove lazyload
+        $div.find('img.js-lazy').each(function(){
+            $(this).attr('src', $(this).attr('data-original'));
+        });
 
         var $popup = $('#modal');
-        $popup.find('.modal-body').html('<div class="book flex">' + content + '</div>');
+        $popup.find('.modal-body').html('<div class="book flex">' + $div.html() + '</div>');
         $popup.modal('show');
     }
 };

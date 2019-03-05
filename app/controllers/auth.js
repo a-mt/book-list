@@ -55,7 +55,8 @@ function AuthHandler(){
             title: 'About me',
             errors: req.flash("errors").pop() || {},
             data: req.flash('data').pop() || {},
-            langs: Langs
+            langs: Langs,
+            url: 'https://' + req.headers.host
         });
     };
     this.settingsSubmit = function(req, res){
