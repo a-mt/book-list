@@ -186,6 +186,8 @@ async function run(res) {
     }
 
     // Loop books
+    var n = 0;
+
     Book.find({ tc: null }, 'title thumbnail')
         //.limit(30)
         .stream()
@@ -193,6 +195,7 @@ async function run(res) {
             if(!doc.thumbnail || errors) {
                 return;
             }
+            n++;
             importThumbnail(doc);
         })
         .on('error', function(err){
@@ -200,6 +203,10 @@ async function run(res) {
         })
         .on('end', function(){
             ended = true;
+            if(!n) {
+                res.write('</pre> Up to date');
+                res.end();
+            }
         });
 }
 
