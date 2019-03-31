@@ -108,6 +108,10 @@ block content
                     label(for="lang") Language
                     input(type="text" name="lang" class="form-control" id="lang" value=filters.lang)
 
+                div(class="form-group")
+                    label(for="category") Category
+                    input(type="text" name="category" class="form-control" id="category" value=filters.category)
+
                 input(type="submit" class="btn btn-default pull-right" value="Update")
 
             div(class=("content" + (books.length == 0 ? ' empty' : '')) data-mode=(modeDetail ? "detail" : "icon"))

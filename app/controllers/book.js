@@ -35,13 +35,14 @@ function BookHandler(){
                 isRead     : "2",
                 title      : "",
                 author     : "",
-                lang       : ""
+                lang       : "",
+                category   : ""
             };
         }
 
         // Current filter
-        ["isWishlist", "isRead", "title", "author", "lang"].forEach((k) => {
-            filters[k] = (typeof _get[k] != "undefined" ? _get[k] : req.cookies.filters[k]).trim();
+        ["isWishlist", "isRead", "title", "author", "lang", "category"].forEach((k) => {
+            filters[k] = ((typeof _get[k] != "undefined" ? _get[k] : req.cookies.filters[k]) || "").trim();
         });
 
         // Build MongoDB query
@@ -59,6 +60,9 @@ function BookHandler(){
         }
         if(filters.lang) {
             q.lang = filters.lang;
+        }
+        if(filters.category) {
+            q.category = new RegExp(escapeRegExp(filters.category), 'i');
         }
 
         return [q, filters];
