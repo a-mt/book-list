@@ -121,7 +121,7 @@ async function run(res) {
      */
     async function importThumbnail(doc) {
         running++;
-        sleep(100); // just to avoid sending to many requests at once
+        sleep(120); // just to avoid sending to many requests at once
 
         var url = doc.thumbnail;
 
