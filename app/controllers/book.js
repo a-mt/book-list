@@ -53,7 +53,8 @@ function BookHandler(){
             q.isRead = (filters.isRead == "1");
         }
         if(filters.title) {
-            q.title = new RegExp(escapeRegExp(filters.title), 'i');
+            var regex = new RegExp(escapeRegExp(filters.title), 'i');
+            q.$or = [ { title: regex }, { subtitle: regex } ];
         }
         if(filters.author) {
             q.authors = new RegExp(escapeRegExp(filters.author), 'i');
