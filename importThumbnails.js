@@ -7,7 +7,7 @@ var express  = require('express'),
     Book     = require('./app/models/book');
 
 //+--------------------------------------------------------
-require('dotenv').load(); // load .env variables
+require('dotenv').config(); // load .env variables
 
 // Connect DB
 var mongoose = require('mongoose');
