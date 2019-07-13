@@ -22,6 +22,7 @@ module.exports = function(app) {
        .post(global.isLoggedIn, bookHandler.isBook, bookHandler.editSubmit);
 
     // Import/export JSON
+    app.get('/export', bookHandler.exportJson);
     app.get('/export/:userid', bookHandler.exportJson);
 
     app.route('/import')
