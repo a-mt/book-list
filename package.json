@@ -18,6 +18,7 @@
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
     "express-session": "^1.16.2",
+    "googleapis": "^41.0.0",
     "mongoose": "^5.6.4",
     "multer": "^1.4.1",
     "npm-check-updates": "^3.1.18",
@@ -27,8 +28,5 @@
   },
   "engines": {
     "node": "11.x"
-  },
-  "devDependencies": {
-    "googleapis": "^41.0.0"
   }
 }

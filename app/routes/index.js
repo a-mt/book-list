@@ -1,4 +1,5 @@
-var bookHandler = require(process.cwd() + '/app/controllers/book.js');
+var bookHandler       = require(process.cwd() + '/app/controllers/book.js'),
+    thumbnailsHandler = require(process.cwd() + '/app/controllers/importThumbnails.js');
 
 module.exports = function(app) {
 
@@ -28,4 +29,8 @@ module.exports = function(app) {
     app.route('/import')
        .get(global.isLoggedIn, bookHandler.importJson)
        .post(global.isLoggedIn, bookHandler.importJsonSubmit);
+
+    // Import thumbnails
+    app.get('/importThumbnails', thumbnailsHandler.importThumbnails);
+    app.get('/oauth2callback', thumbnailsHandler.oauth2callback);
 };

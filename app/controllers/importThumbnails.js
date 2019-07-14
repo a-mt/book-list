@@ -4,18 +4,7 @@ var express  = require('express'),
     {google} = require('googleapis'),
     http     = require('http'),
     https    = require('https'),
-    Book     = require('./app/models/book');
-
-//+--------------------------------------------------------
-require('dotenv').config(); // load .env variables
-
-// Connect DB
-var mongoose = require('mongoose');
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useCreateIndex: true
-});
-mongoose.Promise = global.Promise;
+    Book     = require('../models/book');
 
 //+--------------------------------------------------------
 // Handle Google Drive Auth
@@ -35,44 +24,51 @@ var scopes = [
 ];
 var credentialsPath = ".credentials.json";
 
-app.get('/', function(req, res){
+//+--------------------------------------------------------
+// Exposed methods
 
-    // If the user already authorized the app: continue
-    if (fs.existsSync(credentialsPath)) {
-        fs.readFile(credentialsPath, 'utf8', function(err, data){
-            if(err){
-                console.log(err);
-            } else {
-                var tokens = JSON.parse(data);
-                oauth2Client.credentials = tokens;
-                run(res);
-            }
-        });
+var handler = {
+    importThumbnails: function(req, res){
 
-    // If not: open Google authorization page
-    } else {
-        const authorizeUrl = oauth2Client.generateAuthUrl({
-            access_type: 'offline',
-            scope: scopes.join(' '),
+        // If the user already authorized the app: continue
+        if (fs.existsSync(credentialsPath)) {
+            fs.readFile(credentialsPath, 'utf8', function(err, data){
+                if(err){
+                    console.log(err);
+                } else {
+                    var tokens = JSON.parse(data);
+                    oauth2Client.credentials = tokens;
+                    run(res);
+                }
+            });
+    
+        // If not: open Google authorization page
+        } else {
+            const authorizeUrl = oauth2Client.generateAuthUrl({
+                access_type: 'offline',
+                scope: scopes.join(' '),
+            });
+            console.log(authorizeUrl);
+            res.redirect(authorizeUrl);
+        }
+
+    },
+    oauth2callback: function(req, res){
+        var code = req.query.code;
+    
+        oauth2Client.getToken(code).then(({tokens}) => {
+            oauth2Client.credentials = tokens;
+    
+            fs.writeFile(credentialsPath, JSON.stringify(tokens), 'utf8', function(err) {
+                if(err) {
+                    console.log(err);
+                }
+                console.log(tokens);
+                res.redirect('/importThumbnails');
+            });
         });
-        res.redirect(authorizeUrl);
     }
-});
-
-app.get('/oauth2callback', function(req, res){
-    var code = req.query.code;
-
-    oauth2Client.getToken(code).then(({tokens}) => {
-        oauth2Client.credentials = tokens;
-
-        fs.writeFile(credentialsPath, JSON.stringify(tokens), 'utf8', function(err) {
-            if(err) {
-                console.log(err);
-            }
-            res.json(tokens);
-        });
-    });
-});
+};
 
 //+--------------------------------------------------------
 // Import thumbnails
@@ -94,7 +90,8 @@ async function run(res) {
     var count   = 0,
         errors  = 0,
         running = 0,
-        ended   = false;
+        ended   = false,
+        refresh = false;
 
     process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 
@@ -120,10 +117,18 @@ async function run(res) {
      * Called for each document which needs to upload a thumbnail
      */
     async function importThumbnail(doc) {
+        if(refresh) {
+            return;
+        }
         running++;
         sleep(120); // just to avoid sending to many requests at once
 
         var url = doc.thumbnail;
+        if(url.indexOf('http') != 0) {
+            console.error(doc.title, ': the thumbnail is not a valid URL', url);
+            errors++;
+            return feedback();
+        }
 
         // Get thumbnail
         (url.indexOf('https://') == 0 ? https : http).get(url, file => {
@@ -143,8 +148,19 @@ async function run(res) {
             // When it's done
             }, function(err, subres) {
                 if(err) {
-                    console.log("Err uploading document", err);
                     errors++;
+                    if(refresh) {
+                        return feedback();
+                    }
+
+                    if(typeof err.response != 'undefined' && err.response.data != 'undefined') {
+                        refresh = err.response.data.error_description = 'Missing required parameter: refresh_token';
+                    }
+                    if(refresh) {
+                        console.log("Token has to be refreshed", err.response);
+                    } else {
+                        console.log("Err uploading document", err);
+                    }
                     feedback();
 
                 } else {
@@ -210,8 +226,4 @@ async function run(res) {
         });
 }
 
-// Start server
-var port = 8081;
-app.listen(port, function(){
-   console.log('The server is listening on port ' + port);
-});
+module.exports = handler;
