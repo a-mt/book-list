@@ -47,7 +47,7 @@ function BookHandler(){
 
         // Build MongoDB query
         if(filters.isWishlist != "2") {
-            q.isWishlist = (filters.isWishlist == "1");
+            q.isWishlist = parseInt(filters.isWishlist, 10);
         }
         if(filters.isRead != "2") {
             q.isRead = (filters.isRead == "1");
@@ -165,7 +165,7 @@ function BookHandler(){
         }
 
         var id         = req.body.choice,
-            isWishlist = (req.body.isWishlist == "1"),
+            isWishlist = parseInt(req.body.isWishlist, 10),
             isRead     = (req.body.isRead == "1");
         if(id == 'custom') {
             callback(req.body, isWishlist, isRead);
@@ -261,7 +261,7 @@ function BookHandler(){
             book.isMature   = (post.isMature == "1");
             book.link       = post.link;
             book.thumbnail  = post.thumbnail;
-            book.isWishlist = (post.isWishlist == "1");
+            book.isWishlist = parseInt(post.isWishlist, 10);
             book.isRead     = (post.isRead == "1");
             book.lang       = post.lang;
 

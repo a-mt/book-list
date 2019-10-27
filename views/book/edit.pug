@@ -71,10 +71,13 @@ block content
                 div(class="form-group")
                     label Owned ? &nbsp;
                     label(class="radio-inline")
-                        input(type="radio" name="isWishlist" value="0" checked=(!item.isWishlist))
+                        input(type="radio" name="isWishlist" value="0" checked=(item.isWishlist == 0))
                         | Yes
                     label(class="radio-inline")
-                        input(type="radio" name="isWishlist" value="1" checked=(item.isWishlist))
+                        input(type="radio" name="isWishlist" value="2" checked=(item.isWishlist == 2))
+                        | No
+                    label(class="radio-inline")
+                        input(type="radio" name="isWishlist" value="1" checked=(item.isWishlist == 1))
                         | On wishlist
 
                 div(class="form-group")

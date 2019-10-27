@@ -15,6 +15,10 @@ mongoose.connect(process.env.MONGO_URI, {
 });
 mongoose.Promise = global.Promise;
 
+if(process.env.UPGRADE) {
+    require('./upgrade.js');
+}
+
 // Auth
 var passport = require('passport');
 require('./app/auth/passport')(passport);

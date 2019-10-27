@@ -20,7 +20,10 @@ var Book = new Schema({
     isMature: Boolean,              // volumeInfo.maturityRating == MATURE
     link: String,                   // volumeInfo.previewLink
     isRead: Boolean,
-    isWishlist: Boolean,
+    isWishlist: {                   // 0: owned, 0: isWishlist: 2: epub
+        type: Number,
+        integer: true
+    },
     lang: String,
     insert: { type: Date, default: Date.now },
     tc: Boolean                     // thumbnail is cached
