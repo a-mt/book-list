@@ -4,3 +4,4 @@ npm-debug.log
 TODOLIST.md
 .credentials.json
 package-lock.json
+docker_volumes

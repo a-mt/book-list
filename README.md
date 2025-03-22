@@ -18,7 +18,13 @@ Use cases:
    generate an API key, and activate Google Books API for this project
 2. Create a [MongoDB database](http://mlab.com/), and create an user for this database
 3. Copy `.env.example` to `.env` and update the variables in it
-4. Install the dependencies
+4. Set the current node version
+
+       npm install -g n
+       n 16.20.2
+       cd /srv
+
+5. Install the dependencies
 
        npm install
 
