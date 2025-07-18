@@ -2,6 +2,7 @@ var express  = require('express'),
     app      = express(),
     fs       = require('fs'),
     {google} = require('googleapis'),
+    {OAuth2Client} = require('google-auth-library'),
     http     = require('http'),
     https    = require('https'),
     Book     = require('../models/book');
@@ -9,16 +10,9 @@ var express  = require('express'),
 //+--------------------------------------------------------
 // Handle Google Drive Auth
 
-/* Google Drive onyl supports OAuth 2.0
+/* Google Drive only supports OAuth 2.0
  * https://developers.google.com/drive/api/v2/about-auth
  */
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_API_CLIENT_ID,
-  process.env.GOOGLE_API_CLIENT_SECRET,
-  process.env.GOOGLE_AUTH_REDIRECT_URL
-);
-google.options({auth: oauth2Client});
-
 var scopes = [
     'https://www.googleapis.com/auth/drive'
 ];
@@ -29,6 +23,11 @@ var credentialsPath = ".credentials.json";
 
 var handler = {
     importThumbnails: function(req, res){
+        const oauth2Client = new OAuth2Client({
+          clientId: process.env.GOOGLE_API_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_API_CLIENT_SECRET,
+          redirectUri: process.env.GOOGLE_AUTH_REDIRECT_URL,
+        });
 
         // If the user already authorized the app: continue
         if (fs.existsSync(credentialsPath)) {
@@ -37,35 +36,62 @@ var handler = {
                     console.log(err);
                 } else {
                     var tokens = JSON.parse(data);
-                    oauth2Client.credentials = tokens;
+                    oauth2Client.setCredentials(tokens);
+
+                    google.options({auth: oauth2Client});
                     run(res);
                 }
             });
-    
+
         // If not: open Google authorization page
         } else {
+            // https://cloud.google.com/nodejs/docs/reference/google-auth-library/latest/google-auth-library/generateauthurlopts
             const authorizeUrl = oauth2Client.generateAuthUrl({
                 access_type: 'offline',
                 scope: scopes.join(' '),
+                response_type: 'code token',
             });
-            console.log(authorizeUrl);
+            console.log('auth url', authorizeUrl);
             res.redirect(authorizeUrl);
         }
-
     },
     oauth2callback: function(req, res){
-        var code = req.query.code;
-    
-        oauth2Client.getToken(code).then(({tokens}) => {
-            oauth2Client.credentials = tokens;
-    
-            fs.writeFile(credentialsPath, JSON.stringify(tokens), 'utf8', function(err) {
-                if(err) {
-                    console.log(err);
-                }
-                console.log(tokens);
-                res.redirect('/importThumbnails');
-            });
+        const oauth2Client = new OAuth2Client({
+          clientId: process.env.GOOGLE_API_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_API_CLIENT_SECRET,
+          redirectUri: process.env.GOOGLE_AUTH_REDIRECT_URL,
+        });
+        const code = req.query.code;
+
+        if (!code) {
+            return res.send('Missing ?code parameter');
+        }
+
+        // https://googleapis.dev/nodejs/google-auth-library/10.1.0/
+        // https://github.com/googleapis/google-auth-library-nodejs/tree/main
+        const request = oauth2Client.getToken({
+            code,
+        });
+        request.then(({tokens}) => {
+            oauth2Client.setCredentials(tokens);
+
+            if (false) {
+                console.log('Saving tokens', tokens);
+                fs.writeFile(credentialsPath, JSON.stringify(tokens), 'utf8', function(err) {
+                    if(err) {
+                        console.log('Could not save credentials', err);
+                    }
+                    res.redirect('/importThumbnails');
+                });
+            } else {
+                google.options({auth: oauth2Client});
+                run(res);
+            }
+
+        }).catch((err) => {
+            console.error('failed', err);
+            //res.redirect('/importThumbnails');
+            res.send('Get token failed');
         });
     }
 };
@@ -73,6 +99,7 @@ var handler = {
 //+--------------------------------------------------------
 // Import thumbnails
 async function run(res) {
+    console.log('Launching importThumbnails...');
 
     /*Book.find({ tc: true }, function(_, docs){
         res.json(docs);
@@ -180,21 +207,23 @@ async function run(res) {
      * Called after the thumbnail has been uploaded to Google Drive
      */
     function updateDocument(doc, newUrl) {
-        Book.updateOne({ _id: doc._id }, { $set: {
-            thumbnail: newUrl,
-            tc       : true
-
-        }}, function(err){
-            if(err) {
-                console.log("Err saving document", err);
-                errors++;
-                feedback();
-            } else {
+        const updateQuery = {
+            $set: {
+                thumbnail: newUrl,
+                tc       : true,
+            },
+        };
+        Book.updateOne({ _id: doc._id }, updateQuery)
+            .then(() => {
                 console.log(doc._id, doc.title, newUrl);
                 count++;
                 feedback();
-            }
-        });
+            })
+            .catch((err) => {
+                console.log("Err saving document", err);
+                errors++;
+                feedback();
+            });
     }
 
     function sleep(ms){
@@ -204,26 +233,23 @@ async function run(res) {
     // Loop books
     var n = 0;
 
-    Book.find({ tc: null }, 'title thumbnail')
-        //.limit(30)
-        .stream()
-        .on('data', function(doc){
-            if(!doc.thumbnail || errors) {
-                return;
-            }
-            n++;
-            importThumbnail(doc);
-        })
-        .on('error', function(err){
-            console.log(err);
-        })
-        .on('end', function(){
-            ended = true;
-            if(!n) {
-                res.write('</pre> Up to date');
-                res.end();
-            }
-        });
+    const cursor = Book.find(
+        { tc: null },
+        'title thumbnail',
+    ).batchSize(100).cursor({batchSize:100});
+
+    for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
+        if(!doc.thumbnail) {
+            continue;
+        }
+        n++;
+        importThumbnail(doc);
+    }
+    ended = true;
+    if(!n) {
+        res.write('</pre> Up to date');
+        res.end();
+    }
 }
 
 module.exports = handler;

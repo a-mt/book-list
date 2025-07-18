@@ -10,13 +10,15 @@ require('dotenv').config(); // load .env variables
 // Connect DB
 var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useCreateIndex: true
-});
+    serverSelectionTimeoutMS: 3000,
+}).then(
+    () => console.log('Connected to DB'),
+    (err) => console.error('Could not connect to DB', err),
+);
 mongoose.Promise = global.Promise;
 
 if(process.env.UPGRADE) {
-    require('./upgrade.js');
+    require('./migration.js');
 }
 
 // Auth
@@ -24,7 +26,7 @@ var passport = require('passport');
 require('./app/auth/passport')(passport);
 
 var session    = require('express-session'),
-    MongoStore = require('connect-mongo')(session);
+    MongoStore = require('connect-mongo');
 
 app.use(session({
     secret: 'ce0c04361d',
@@ -33,8 +35,8 @@ app.use(session({
     cookie: {maxAge: 24 * 60 * 60 * 1000}, // 1 day
 
     // Save session in database (so it doesn't get lost when server stops)
-    store: new MongoStore({
-        mongooseConnection: mongoose.connection,
+    store: MongoStore.create({
+        client: mongoose.connection.getClient(),
         autoRemove: 'interval',
         autoRemoveInterval: 30, // check expired sessions every 30 min
         touchAfter: 12 * 3600
@@ -68,6 +70,7 @@ app.use('/public', express.static(process.cwd() + '/public'));
 routes(app);
 
 app.set('json spaces', 2);
+app.set('trust proxy', true);
 
 // Start server
 var port = process.env.PORT || 8080;

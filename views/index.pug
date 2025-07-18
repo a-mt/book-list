@@ -58,8 +58,8 @@ block content
                     span(class=("glyphicon glyphicon-th-list switch-mode__btn" + (modeDetail ? " active" : "")) data-mode="detail" title="Detailled view")
 
                 div(class="pull-right actions")
-                    if books.length > 0
-                        a(href=("/export/" + (filters.user || ""))) Export JSON
+                    if filters.user && books.length > 0
+                        a(href=("/export/" + filters.user)) Export JSON
                         if user
                             span &nbsp; / &nbsp;
 

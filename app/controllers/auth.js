@@ -17,16 +17,26 @@ function AuthHandler(){
         var user   = new User(params);
 
         // Save user
-        user.save(function(err){
+        user.save()
+            .then(() => {
+                req.login(user).then(() => {
+                    res.redirect('/profile');
+                });
+            })
+            .catch((err) => {
 
-            // Data validation of model failed
-           if(err) {
+                // Data validation of model failed
                var errors = err.errors || {};
 
                // Err duplicate
-                if (err.name === 'MongoError' && err.code === 11000) {
+                if (err.name === 'MongoServerError' && err.code === 11000) {
                     errors.username = {
-                        message: 'User already exists'
+                        message: 'User already exists',
+                    };
+                }
+                if (!Object.keys(errors).length) {
+                    errors.username = {
+                        message: 'Something went wrong',
                     };
                 }
                 // Render form with errors
@@ -34,12 +44,7 @@ function AuthHandler(){
                 req.flash('data', req.body);
 
                 res.redirect('/signup');
-            } else {
-                req.login(user, function () {
-                    res.redirect('/profile');
-                });
-            }
-        });
+            });
     };
 
     // Login with an account
@@ -79,55 +84,53 @@ function AuthHandler(){
 
                 // Save changes
                 user.password = post.newpassword;
-                user.save(function(err){
-
-                    // Data validation failed ?
-                    if(err) {
+                user.save()
+                    .then(() => {
+                        req.flash('success', 'Your password has been successfully updated');
+                    })
+                    .catch((err) => {
+                        // Data validation failed ?
                         req.flash('errors', {
                             newpassword: err.errors.password
                         });
                         req.flash('data', post);
-                    } else {
-                        req.flash('success', 'Your password has been successfully updated');
-                    }
-                    res.redirect('/profile');
-                });
+                    })
+                    .finally(() => {
+                        res.redirect('/profile');
+                    });
             });
         } else {
             user.lang     = post.lang;
             user.email    = post.email;
 
-            user.save(function(err, data){
-
-                // Data validation failed ?
-                if(err) {
+            user.save()
+                .then((data) => {
+                    req.flash('success', 'Your details have been successfully updated');
+                })
+                .catch((err) => {
                     req.flash('errors', err.errors);
                     req.flash('data', post);
-                } else {
-                    req.flash('success', 'Your details have been successfully updated');
-                }
-                res.redirect('/profile');
-            });
+                })
+                .finally(() => {
+                    res.redirect('/profile');
+                });
         }
     };
 
     this.displayProfile = function(req, res) {
         var username = req.params[0];
-        User.findOne({
-            username: username
-        }, function(err, user){
-            if(err) {
-                throw new err;
-            }
-            if(!user) {
-                res.status(404).redirect('/');
-                return;
-            }
-            res.render('auth/profile', {
-                title: 'Profile of ' + user.username,
-                user: user
+
+        User.findOne({username: username})
+            .then((user) => {
+                if(!user) {
+                    res.status(404).redirect('/');
+                    return;
+                }
+                res.render('auth/profile', {
+                    title: 'Profile of ' + user.username,
+                    user: user
+                });
             });
-        });
     };
 }
 

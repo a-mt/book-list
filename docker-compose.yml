@@ -1,28 +1,10 @@
 services:
-  mongo:
-    image: mongo:5.0
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "pgrep", "mongod"]
-      timeout: 20s
-      interval: 10s
-      retries: 5
-    expose:
-      - "27017"
-    volumes:
-      - db:/data/db
-
   node:
-    image: node:16.20.2
+    image: node:22.17.1
     volumes:
       - .:/srv
     ports:
       - "8080:8080"
     command: bash -c 'cd /srv && npm start'
-    depends_on:
-      mongo:
-        condition: service_healthy
-
-volumes:
-  db:
-
+    dns:
+      - 8.8.8.8

@@ -88,12 +88,12 @@ function BookHandler(){
         }
 
         // Find books
-        var query = Book.find(q).then(function(docs){
+        var query = Book.find(q).then((docs) => {
             books = docs;
         });
 
         // Render
-        query.then(function(){
+        query.then(() => {
             res.cookie('filters', filters);
             res.render('index', { books, filters, title });
         });
@@ -109,7 +109,7 @@ function BookHandler(){
         }
 
         // Query Google API
-        https.get('https://www.googleapis.com/books/v1/volumes?key=' + process.env.GOOGLE_API_KEY + '&q=' + name + (lang ? '&langRestrict=' + lang : ''), function(subres){
+        https.get('https://www.googleapis.com/books/v1/volumes?key=' + process.env.GOOGLE_BOOK_API_KEY + '&q=' + name + (lang ? '&langRestrict=' + lang : ''), function(subres){
 
             if(subres.statusCode != 200) {
                 res.status(subres.statusCode).send(subres.statusMessage);
@@ -147,21 +147,17 @@ function BookHandler(){
             book.isWishlist = isWishlist;
 
             // Save it
-            book.save(function(err, obj){
-
-                // Data validation of model failed
-               if(err) {
-                   var errors = err.errors || {};
-
+            book.save()
+                .then((obj) => {
+                    res.redirect('/book/edit/' + obj.id);
+                })
+                .catch((errors) => {
                     // Render form with errors
-                    req.flash('errors', errors);
+                    req.flash('errors', errors || {});
                     req.flash('data', req.body);
 
                     res.redirect('/book/new');
-                } else {
-                    res.redirect('/book/edit/' + obj.id);
-                }
-            });
+                });
         }
 
         var id         = req.body.choice,
@@ -170,7 +166,7 @@ function BookHandler(){
         if(id == 'custom') {
             callback(req.body, isWishlist, isRead);
         } else {
-            https.get('https://www.googleapis.com/books/v1/volumes/' + id + '?key=' + process.env.GOOGLE_API_KEY, function(subres){
+            https.get('https://www.googleapis.com/books/v1/volumes/' + id + '?key=' + process.env.GOOGLE_BOOK_API_KEY, function(subres){
 
             if(subres.statusCode != 200) {
                 res.status(subres.statusCode).send(subres.statusMessage);
@@ -208,10 +204,10 @@ function BookHandler(){
     // owned by the current user
     this.isBook = function(req, res, next) {
         var id = req.params.id;
-        Book.findById(id, function (err, book) {
+        Book.findById(id).then((book) => {
 
             // Not found
-            if(err || !book) {
+            if(!book) {
                 req.flash('error', 'The required book doesn\'t exist');
                 res.status(404).redirect('/');
 
@@ -223,6 +219,9 @@ function BookHandler(){
                 req.book = book;
                 return next();
             }
+        }).catch((err) => {
+            req.flash('error', 'The required book doesn\'t exist');
+            res.status(404).redirect('/');
         });
     };
 
@@ -241,7 +240,7 @@ function BookHandler(){
 
         // Delete book
         if(post.delete) {
-            book.remove(function(){
+            book.deleteOne().then(() => {
                 req.flash('success', 'The book has been successfully deleted');
                 res.redirect('/');
             });
@@ -265,17 +264,18 @@ function BookHandler(){
             book.isRead     = (post.isRead == "1");
             book.lang       = post.lang;
 
-            book.save(function(err){
-
-                // Data validation failed ?
-                if(err) {
+            book.save()
+                .then(() => {
+                    req.flash('success', 'Your book has been successfully updated');
+                })
+                .catch((err) => {
+                    // Data validation failed
                     req.flash('error', err);
                     req.flash('data', post);
-                } else {
-                    req.flash('success', 'Your book has been successfully updated');
-                }
-                res.redirect('/book/edit/' + book.id);
-            });
+                })
+                .finally(() => {
+                    res.redirect('/book/edit/' + book.id);
+                });
         }
     };
 
@@ -283,7 +283,7 @@ function BookHandler(){
     this.exportJson = function(req, res) {
         var [q, ] = buildQuery(req);
 
-        Book.find(q, '-insert -_owner -__v', function(_, docs){
+        Book.find(q, '-insert -_owner -__v').then((docs) => {
             res.set('Content-Disposition', 'attachment; filename="books.json"');
             res.set('Content-type', 'application/octet-stream');
             res.json(docs);
@@ -308,7 +308,7 @@ function BookHandler(){
                 // pass
 
             // Is .json file?
-            } else if(req.file.mimetype != "application/json") {
+            } else if(req.file?.mimetype !== "application/json") {
                 err = 'You should upload a .json file';
 
             // Contains valid json?
@@ -346,9 +346,9 @@ function BookHandler(){
                     data._owner = _owner;
 
                     if(_id) {
-                        u= Book.update({_id, _owner}, data, {upsert: true})
+                        u= Book.updateOne({_id, _owner}, data, {upsert: true})
                             .then(function(res) {
-                                nupdate += res.nModified || 0;
+                                nupdate += 1;
                             });
                     } else {
                         u= Book.create(data)

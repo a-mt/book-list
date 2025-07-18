@@ -53,3 +53,9 @@ block content
                     p(class="error") #{errors.newpassword.message}
 
             input(type="submit" class="btn btn-default" name="submitPassword")
+
+    div
+        h2(class="page-header") Sharing
+        a(href="/export/") Export JSON
+        span &nbsp; / &nbsp;
+        a(href="/import/") Import JSON
