@@ -181,7 +181,7 @@ function BookHandler(){
                         title      : json.title,
                         subtitle   : json.subtitle,
                         authors    : (json.authors ? json.authors.join(', ') : ''),
-                        thumbnail  : json.imageLinks.thumbnail,
+                        thumbnail  : json.imageLinks ? json.imageLinks.thumbnail: '',
                         year       : json.publishedDate.substr(0,4),
                         publisher  : json.publisher,
                         pageCount  : json.pageCount,
