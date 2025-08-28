@@ -83,6 +83,7 @@ Use cases:
 
 ### Deploy on App Engine
 
+* Ensure your .env file is up to date
 * Deploy
 
     ```
