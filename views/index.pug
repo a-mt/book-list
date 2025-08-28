@@ -97,6 +97,27 @@ block content
                         | All
 
                 div(class="form-group")
+                    label Rating &nbsp;
+                    label(class="checkbox-inline")
+                        input(type="checkbox" name="rating" value="0" checked=(filters.rating.includes("0")))
+                        | Disappointing
+                    label(class="checkbox-inline")
+                        input(type="checkbox" name="rating" value="1" checked=(filters.rating.includes("1")))
+                        | Not much to it
+                    label(class="checkbox-inline")
+                        input(type="checkbox" name="rating" value="2" checked=(filters.rating.includes("2")))
+                        | Neutral
+                    label(class="checkbox-inline")
+                        input(type="checkbox" name="rating" value="3" checked=(filters.rating.includes("3")))
+                        | Good
+                    label(class="checkbox-inline")
+                        input(type="checkbox" name="rating" value="4" checked=(filters.rating.includes("4")))
+                        | Excellent
+                    label(class="checkbox-inline")
+                        input(type="checkbox" name="rating" value="5" checked=(filters.rating.includes("5")))
+                        | Favorite
+
+                div(class="form-group")
                     label(for="title") Title
                     input(type="text" name="title" class="form-control" id="title" value=filters.title)
 

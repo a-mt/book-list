@@ -235,3 +235,32 @@ footer { text-align: right; }
   font-weight: 500;
   padding: 5px;
 }
+
+.rating {
+  background: url(/public/img/star-matrix.png) no-repeat;
+  height: 16px;
+  list-style: none;
+  position: absolute;
+  padding: 0;
+  top: 0;
+  right: 15px;
+  width: 90px;
+}
+.rating--0 {
+  background-position: 0px 0px;
+}
+.rating--1 {
+  background-position: 0px -32px;
+}
+.rating--2 {
+  background-position: 0px -64px;
+}
+.rating--3 {
+  background-position: 0px -96px;
+}
+.rating--4 {
+  background-position: 0px -128px;
+}
+.rating--5 {
+  background-position: 0px -160px;
+}

@@ -13,6 +13,9 @@ div(class="book flex list-group-item item")
             if item.isMature
                 span(class="book-thumbnail__maturity pull-right") <img src="http://i.imgur.com/yajkTdn.png" alt="Mature">
 
+            if item.rating
+                span(class="rating rating--" + item.rating title=item.rating)
+
             if item.isRead
                 span(class="read") Read
 

@@ -117,6 +117,30 @@ block content
                     label(class="radio-inline")
                         input(type="radio" name="isRead" value="0" checked)
                         | No
+
+                div(class="form-group")
+                    label Rating &nbsp;
+                    label(class="radio-inline")
+                        input(type="radio" name="rating" value="" checked)
+                        | Unset
+                    label(class="radio-inline")
+                        input(type="radio" name="rating" value="0")
+                        | Disappointing
+                    label(class="radio-inline")
+                        input(type="radio" name="rating" value="1")
+                        | Not much to it
+                    label(class="radio-inline")
+                        input(type="radio" name="rating" value="2")
+                        | Neutral
+                    label(class="radio-inline")
+                        input(type="radio" name="rating" value="3")
+                        | Good
+                    label(class="radio-inline")
+                        input(type="radio" name="rating" value="4")
+                        | Excellent
+                    label(class="radio-inline")
+                        input(type="radio" name="rating" value="5")
+                        | Favorite
             br
             input(type="submit" id="submit" class="btn" disabled title="Pick your book")
 

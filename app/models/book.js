@@ -24,6 +24,7 @@ var Book = new Schema({
         type: Number,
         integer: true
     },
+    rating: String,
     lang: String,
     insert: { type: Date, default: Date.now },
     tc: Boolean                     // thumbnail is cached

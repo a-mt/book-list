@@ -13,6 +13,9 @@ div(class="thumbnail pull-left book-thumbnail item" id="thumbnail"+item.id)
     if item.isRead
         span(class="read") Read
 
+    if item.rating
+        span(class="rating rating--" + item.rating title=item.rating)
+
     div(class="hover")
         a(class="left js-view" title="View infos" href="#view" data-id=item.id)
             span(class="glyphicon glyphicon-list-alt")

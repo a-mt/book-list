@@ -36,13 +36,22 @@ function BookHandler(){
                 title      : "",
                 author     : "",
                 lang       : "",
-                category   : ""
+                category   : "",
+                rating     : "",
             };
         }
 
         // Current filter
-        ["isWishlist", "isRead", "title", "author", "lang", "category"].forEach((k) => {
-            filters[k] = ((typeof _get[k] != "undefined" ? _get[k] : req.cookies.filters[k]) || "").trim();
+        ["isWishlist", "isRead", "title", "author", "lang", "category", "rating"].forEach((k) => {
+            let val = (typeof _get[k] != "undefined" ? _get[k] : req.cookies.filters[k]);
+
+            if (k == "rating" && typeof _get[k] == "undefined" && typeof _get["isWishlist"] != "undefined") {
+                val = [];
+            }
+            if (typeof val == "object") {
+                val = val.join(",");
+            }
+            filters[k] = (val || "").trim();
         });
 
         // Build MongoDB query
@@ -51,6 +60,9 @@ function BookHandler(){
         }
         if(filters.isRead != "2") {
             q.isRead = (filters.isRead == "1");
+        }
+        if(filters.rating) {
+            q.rating = {$in: filters.rating.split(',')};
         }
         if(filters.title) {
             var regex = new RegExp(escapeRegExp(filters.title), 'i');
@@ -140,11 +152,12 @@ function BookHandler(){
     };
     this.addSubmit = function(req, res) {
 
-        function callback(data, isWishlist, isRead) {
+        function callback(data, isWishlist, isRead, rating) {
             var book        = new Book(data);
             book._owner     = req.user.id;
             book.isRead     = isRead;
             book.isWishlist = isWishlist;
+            book.rating     = rating;
 
             // Save it
             book.save()
@@ -162,9 +175,11 @@ function BookHandler(){
 
         var id         = req.body.choice,
             isWishlist = parseInt(req.body.isWishlist, 10),
-            isRead     = (req.body.isRead == "1");
+            isRead     = (req.body.isRead == "1"),
+            rating     = req.body.rating || "";
+
         if(id == 'custom') {
-            callback(req.body, isWishlist, isRead);
+            callback(req.body, isWishlist, isRead, rating);
         } else {
             https.get('https://www.googleapis.com/books/v1/volumes/' + id + '?key=' + process.env.GOOGLE_BOOK_API_KEY, function(subres){
 
@@ -190,7 +205,7 @@ function BookHandler(){
                         link       : json.previewLink,
                         lang       : json.language
                     };
-                    callback(post, isWishlist, isRead);
+                    callback(post, isWishlist, isRead, rating);
                 });
             }
 
@@ -263,6 +278,7 @@ function BookHandler(){
             book.isWishlist = parseInt(post.isWishlist, 10);
             book.isRead     = (post.isRead == "1");
             book.lang       = post.lang;
+            book.rating     = post.rating;
 
             book.save()
                 .then(() => {
